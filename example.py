@@ -19,7 +19,7 @@ async def main():
     print(f'MakeMKV build: {await makemkv.get_app_string(AppString.Build)}')
     print(f'Interface language: {await makemkv.get_app_string(AppString.InterfaceLanguage)}')
 
-    await makemkv.set_output_folder('/home/dex/Videos')
+    await makemkv.set_output_folder('~/Videos')
     await makemkv.update_avalible_drives()
 
     print('Waiting for disc...')
