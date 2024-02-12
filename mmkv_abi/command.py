@@ -1,9 +1,10 @@
 from enum import Enum
 
+
 class Command(Enum):
-    '''
+    """
     Ported from the aproxy.h file
-    '''
+    """
     Nop = 0
     Return = 1
     ClientDone = 2
@@ -11,7 +12,7 @@ class Command(Enum):
     CallOnIdle = 4
     CallCancelAllJobs = 4
 
-    CallSetOutputFolder=16
+    CallSetOutputFolder = 16
     CallUpdateAvailableDrives = 17
     CallOpenFile = 18
     CallOpenCdDisk = 19

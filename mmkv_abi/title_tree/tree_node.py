@@ -2,6 +2,7 @@ import weakref
 
 from mmkv_abi.item_attribute import ItemAttribute
 
+
 class TreeNode:
     def __init__(self, makemkv, handle: int):
         self._makemkv = weakref.ref(makemkv)
@@ -12,7 +13,7 @@ class TreeNode:
     async def get_info(self, item_attribute: ItemAttribute):
         if item_attribute not in self._info_cache:
             self._info_cache[item_attribute] = await self._makemkv().get_ui_item_info(self._handle, item_attribute)
-        
+
         return self._info_cache[item_attribute]
 
     async def get_name(self):
@@ -35,7 +36,7 @@ class TreeNode:
             await self.get_state()
 
         return await self.get_state() & 0x01 == 1
-    
+
     async def is_expanded(self):
         if self._state is None:
             await self.get_state()
