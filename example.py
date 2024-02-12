@@ -10,6 +10,7 @@ from mmkv_abi.drive_info.drive_state import DriveState
 from mmkv_abi.mmkv import MakeMKV
 from mmkv_abi.app_string import AppString
 
+
 async def main():
     makemkv = MakeMKV(setup_logger(logging.INFO))
     await makemkv.init()
@@ -20,7 +21,7 @@ async def main():
     print(f'Interface language: {await makemkv.get_app_string(AppString.InterfaceLanguage)}')
 
     await makemkv.set_output_folder('~/Videos')
-    await makemkv.update_avalible_drives()
+    await makemkv.update_available_drives()
 
     print('Waiting for disc...')
     await wait_for_disc_inserted(makemkv)
@@ -33,7 +34,7 @@ async def main():
 
     for title in makemkv.titles:
         duration = await title.get_duration()
-        await title.set_enabled(duration > lower_bound and duration < upper_bound)
+        await title.set_enabled(lower_bound < duration < upper_bound)
 
     print('\n\nTitle Tree:')
     await makemkv.titles.print()
@@ -55,6 +56,7 @@ async def main():
             await makemkv.idle()
             await asyncio.sleep(0.25)
 
+
 def setup_logger(log_level):
     logger = getLogger(__name__)
     logger.setLevel(log_level)
@@ -64,6 +66,7 @@ def setup_logger(log_level):
 
     logger.addHandler(handler)
     return logger
+
 
 async def wait_for_disc_inserted(makemkv):
     while True:
@@ -76,10 +79,12 @@ async def wait_for_disc_inserted(makemkv):
         await makemkv.idle()
         await asyncio.sleep(0.25)
 
+
 async def wait_for_titles_populated(makemkv):
     while makemkv.titles is None:
         await makemkv.idle()
         await asyncio.sleep(0.25)
+
 
 if __name__ == '__main__':
     asyncio.run(main())

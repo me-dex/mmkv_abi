@@ -1,6 +1,5 @@
 from datetime import timedelta
 from mmkv_abi.item_attribute import ItemAttribute
-from mmkv_abi.title_tree.chapter import Chapter
 from mmkv_abi.title_tree.chapter_list import ChapterList
 from mmkv_abi.title_tree.track import Track
 from mmkv_abi.title_tree.tree_node import TreeNode

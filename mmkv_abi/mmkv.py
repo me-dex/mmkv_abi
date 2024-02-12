@@ -26,7 +26,7 @@ class MakeMKV:
     def _32t64(x, y):
         return x + (y << 32)
 
-    def __init__(self, logger = None):
+    def __init__(self, logger=None):
         self.language_data = None
         self.current_info = [None] * 10
         self.job_mode = False
@@ -50,7 +50,7 @@ class MakeMKV:
         if self._exec is None:
             raise MakeMKVNotFound()
 
-    async def init(self, load_interface_language_data = True):
+    async def init(self, load_interface_language_data=True):
         self._process = await asyncio.create_subprocess_exec(
             self._exec, 'guiserver', f'{MakeMKV.ABI_VERSION}+{MakeMKV.TRANSPORT}',
             stdout=PIPE, stderr=STDOUT, stdin=PIPE
@@ -65,7 +65,7 @@ class MakeMKV:
         stdout = b'\x00'
         while stdout[-1] != 0xaa:
             stdout = await self._process.stdout.read(4)
-        
+
         self._process.stdin.write(b'\xbb')
         await self._process.stdin.drain()
 
@@ -77,16 +77,16 @@ class MakeMKV:
     async def idle(self):
         await self._transact(Command.CallOnIdle)
 
-    async def update_avalible_drives(self, flags: int = 0):
+    async def update_available_drives(self, flags: int = 0):
         await self._transact(Command.CallUpdateAvailableDrives, ('<I', flags))
 
-    async def get_app_string(self, key: AppString | int, index_1 = 0, index_2 = 0):
+    async def get_app_string(self, key: AppString | int, index_1=0, index_2=0):
         data = (await self._transact(
-            Command.CallAppGetString, 
+            Command.CallAppGetString,
             ('<I', key if isinstance(key, int) else key.value), ('<I', index_1), ('<I', index_2)
         )).data
         return str(data, 'utf-8')
-    
+
     async def open_cd_disk(self, index, flags: int = 0):
         await self._transact(Command.CallOpenCdDisk, ('<I', index), ('<I', flags))
 
@@ -94,7 +94,7 @@ class MakeMKV:
         res = await self._transact(Command.CallGetUiItemInfo, ('<Q', handle), ('<I', item_attribute.value))
         if res.args[0] != 0:
             if self.language_data is None:
-                self.logger.warn('Language data not loaded; returning raw index')
+                self.logger.warning('Language data not loaded; returning raw index')
                 return res.args[0]
 
             return self.language_data[res.args[0]]
@@ -109,7 +109,7 @@ class MakeMKV:
 
         if len(packed_data) != packed_size:
             raise RuntimeError('Packed language data does not match expected size')
-        
+
         unpacked_data = zlib.decompress(packed_data, bufsize=unpacked_size)
         if len(unpacked_data) != unpacked_size:
             raise RuntimeError('Unpacked language data does not match expected size')
@@ -119,7 +119,7 @@ class MakeMKV:
     async def get_ui_item_state(self, handle):
         res = await self._transact(Command.CallGetUiItemState, ('<Q', handle))
         return res.args[0]
-    
+
     async def set_ui_item_state(self, handle, state):
         await self._transact(Command.CallSetUiItemState, ('<Q', handle), ('<I', state))
 
@@ -129,15 +129,15 @@ class MakeMKV:
     async def save_all_selected_to_mkv(self):
         await self._transact(Command.CallSaveAllSelectedTitlesToMkv)
 
-    async def _transact(self, cmd: Command, *args,  data: bytes = b''):
+    async def _transact(self, cmd: Command, *args, data: bytes = b''):
         await self._send_cmd(cmd, *args, data=data)
         return await self._recv_cmd()
 
     async def _send_cmd(self, cmd: Command, *args, data: bytes = b''):
         buffer = b''
 
-        for format, arg in args:
-            buffer += struct.pack(format, arg)
+        for fmt, arg in args:
+            buffer += struct.pack(fmt, arg)
 
         buffer = struct.pack('<HBB', len(data), int(len(buffer) / 4), cmd.value) + buffer + data
 
@@ -204,14 +204,14 @@ class MakeMKV:
             cmd = int.from_bytes(buffer, 'little')
             if cmd < 0xf0:
                 raise RuntimeError('Received invalid command')
-                
+
             data_size = arg_len = 0
             cmd = Command(int.from_bytes(buffer, 'little') - 0xf0)
 
         self.logger.debug('Received cmd: %s', cmd)
         self.logger.debug('Received arg length: %d', arg_len)
         self.logger.debug('Received data size: %d', data_size)
-        
+
         args = [struct.unpack('<I', await stream.readexactly(4))[0] for _ in range(arg_len)]
         self.logger.debug('Received args: %s', args)
 
@@ -222,4 +222,4 @@ class MakeMKV:
 
         self.logger.debug('Received data: %s', data)
 
-        return (cmd, args, data)
+        return cmd, args, data

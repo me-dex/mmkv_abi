@@ -1,10 +1,10 @@
 from datetime import datetime
 from enum import IntEnum
-import pprint
 import struct
 
 from .drive_state import DriveState
 from .inquiry_data import InquiryData
+
 
 class DriveInfoCategory(IntEnum):
     Invalid = 0
@@ -38,22 +38,22 @@ class DriveInfoId(IntEnum):
 
     # DiscStandard
     DiscStructure = (DriveInfoCategory.DiscStandard.value << 24) + (0 << 16)
-    DiscStructure_DVD_PhysicalFormat=(DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x000
-    DiscStructure_DVD_CopyrightInformation=(DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x001
-    DiscStructure_BD_DiscInformation=(DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x100
+    DiscStructure_DVD_PhysicalFormat = (DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x000
+    DiscStructure_DVD_CopyrightInformation = (DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x001
+    DiscStructure_BD_DiscInformation = (DriveInfoCategory.DiscStandard.value << 24) + (0 << 16) + 0x100
     TOC = (DriveInfoCategory.DiscStandard.value << 24) + (1 << 16)
     DiscInformation = (DriveInfoCategory.DiscStandard.value << 24) + (2 << 16)
     DiscCapacity = (DriveInfoCategory.DiscStandard.value << 24) + (3 << 16)
 
     # DiscSpecific
-    Aacs = (DriveInfoCategory.DiscSpecific.value << 24) + (0<<16)
-    Aacs_VID = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x80
-    Aacs_KCD = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x7f
-    Aacs_PMSN = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x81
-    Aacs_MID = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x82
-    Aacs_DataKeys = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x84
-    Aacs_BEExtents = (DriveInfoCategory.DiscSpecific.value<<24) + (0<<16) + 0x85
-    Aacs_BindingNonce = (DriveInfoCategory.DiscSpecific.value << 24) + (0<<16) + 0x7e
+    Aacs = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16)
+    Aacs_VID = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x80
+    Aacs_KCD = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x7f
+    Aacs_PMSN = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x81
+    Aacs_MID = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x82
+    Aacs_DataKeys = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x84
+    Aacs_BEExtents = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x85
+    Aacs_BindingNonce = (DriveInfoCategory.DiscSpecific.value << 24) + (0 << 16) + 0x7e
 
 
 class DriveInfo:
@@ -212,8 +212,8 @@ class DriveInfo:
                     continue
 
                 if (
-                    data_view[start_idx + 4:start_idx + 7] == b'DI\x01' and
-                    bytes(data_view[start_idx + 12:start_idx + 15]) in [b'BDO', b'BDW', b'BDR', b'BDU']
+                        data_view[start_idx + 4:start_idx + 7] == b'DI\x01' and
+                        bytes(data_view[start_idx + 12:start_idx + 15]) in [b'BDO', b'BDW', b'BDR', b'BDU']
                 ):
                     instance.disc_type = {
                         1: 'BD-ROM',
@@ -270,11 +270,11 @@ class DriveInfo:
             elif cmd_id == 0x05102210:
                 instance.libredrive_info = str(data_view[start_idx:end_idx - 2], 'utf-8').split('\n')[1:]
             else:
-                #print(cmd_id, data_size, bytes(data_view[start_idx:end_idx]))
+                # print(cmd_id, data_size, bytes(data_view[start_idx:end_idx]))
                 pass
 
         return instance
-    
+
     @classmethod
     def _parse_timestamp(cls, data):
         year = int(str(data[4:8], 'ascii'))
